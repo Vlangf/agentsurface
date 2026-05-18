@@ -1,0 +1,20 @@
+[project]
+name = "agentsurface"
+version = "0.1.0"
+description = "Lightweight attack surface tester for real HTTP JSON AI agents"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn>=0.27",
+    "streamlit>=1.32",
+    "httpx>=0.26",
+    "pydantic>=2.6",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

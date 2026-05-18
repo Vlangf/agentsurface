@@ -1,0 +1,40 @@
+services:
+  backend:
+    build: .
+    image: agentsurface:local
+    command: uv run --no-sync uvicorn app.main:app --host 0.0.0.0 --port 8000
+    environment:
+      AGENTSURFACE_DB: ${AGENTSURFACE_DB:-/data/agentsurface.db}
+      AGENTSURFACE_AI_ATTACK_API_KEY: ${AGENTSURFACE_AI_ATTACK_API_KEY:-}
+      AGENTSURFACE_AI_ATTACK_BASE_URL: ${AGENTSURFACE_AI_ATTACK_BASE_URL:-https://api.openai.com/v1}
+      AGENTSURFACE_AI_ATTACK_MODEL: ${AGENTSURFACE_AI_ATTACK_MODEL:-gpt-4o-mini}
+    ports:
+      - "8000:8000"
+    volumes:
+      - agentsurface-data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2).read()"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  frontend:
+    image: agentsurface:local
+    build: .
+    command: uv run --no-sync streamlit run ui/streamlit_app.py --server.address 0.0.0.0 --server.port 8501 --server.headless true
+    environment:
+      AGENTSURFACE_DB: ${AGENTSURFACE_DB:-/data/agentsurface.db}
+      AGENTSURFACE_AI_ATTACK_API_KEY: ${AGENTSURFACE_AI_ATTACK_API_KEY:-}
+      AGENTSURFACE_AI_ATTACK_BASE_URL: ${AGENTSURFACE_AI_ATTACK_BASE_URL:-https://api.openai.com/v1}
+      AGENTSURFACE_AI_ATTACK_MODEL: ${AGENTSURFACE_AI_ATTACK_MODEL:-gpt-4o-mini}
+    ports:
+      - "8501:8501"
+    volumes:
+      - agentsurface-data:/data
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  agentsurface-data:
