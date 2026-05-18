@@ -78,6 +78,58 @@ Open:
 
 Both services share SQLite data through the `agentsurface-data` Docker volume at `/data/agentsurface.db`.
 
+## Deploy with Docker
+
+Create an environment file from the template:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and set the optional OpenAI-compatible credentials if you want AI attack generation and automatic semantic response judging:
+
+```bash
+AGENTSURFACE_AI_ATTACK_API_KEY=...
+AGENTSURFACE_AI_ATTACK_BASE_URL=https://api.openai.com/v1
+AGENTSURFACE_AI_ATTACK_MODEL=gpt-4o-mini
+```
+
+Build and start the services in the background:
+
+```bash
+docker compose up -d --build
+```
+
+Check that the backend is healthy:
+
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+Expected response:
+
+```json
+{"status":"ok"}
+```
+
+View logs:
+
+```bash
+docker compose logs -f backend frontend
+```
+
+Stop the deployment:
+
+```bash
+docker compose down
+```
+
+To remove stored runs and attack sets as well, delete the Docker volume:
+
+```bash
+docker compose down -v
+```
+
 ## Run locally
 
 Install dependencies:
